@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>All Workers Skill Dashboard</h2>
+  <p>
+    Filter by part/machine and minimum skill level:
+    <label>
+      Part:
+      <select id="partFilter">
+        <option value="">— All Parts —</option>
+        {% for part in parts %}
+          <option value="{{ loop.index0 }}">{{ part }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      Min Skill:
+      <select id="skillFilter">
+        <option value="">— Any —</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>
+    </label>
+  </p>
+
+  <table id="skillsTable" class="display" style="width:100%">
+    <thead>
+      <tr>
+        <th>Name</th>
+        {% for part in parts %}
+          <th>{{ part }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for name, skills in data.items() %}
+        <tr>
+          <td>{{ name }}</td>
+          {% for part in parts %}
+            <td>{{ skills[part] }}</td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {# DataTables CSS/JS #}
+  <link
+    rel="stylesheet"
+    href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"
+  />
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+  <style>
+    /* striped rows + hover */
+    #skillsTable tbody tr:nth-child(even) { background: #f9f9f9; }
+    #skillsTable tbody tr:hover         { background: #e0f0ff; }
+    #skillsTable th { cursor: pointer; }
+  </style>
+
+  <script>
+    $(document).ready(function() {
+      // init DataTable
+      var table = $('#skillsTable').DataTable({
+        paging:   false,
+        info:     false,
+        order:    [],       // no initial sort
+        columnDefs: [{ orderable: true, targets: '_all' }]
+      });
+
+      // clear any search
+      function clearFilters() {
+        table.columns().search('').draw();
+      }
+
+      // when part changes, clear filters
+      $('#partFilter').on('change', function() {
+        clearFilters();
+        $('#skillFilter').val('');
+      });
+
+      // when skill changes, apply column filter
+      $('#skillFilter').on('change', function() {
+        var partIdx = $('#partFilter').val();
+        var minSkill = $(this).val();
+        clearFilters();
+
+        if (partIdx === "") {
+          // no part → do nothing (global search could be used)
+          return;
+        }
+        if (minSkill === "") {
+          // no skill threshold → show all
+          return;
+        }
+        // column index in DataTable = partIdx+1 (0 is Name)
+        var colNum = parseInt(partIdx, 10) + 1;
+        // regex: match any digit between minSkill and 4
+        var regex = '^[' + minSkill + '-4]$';
+        table
+          .column(colNum)
+          .search(regex, true, false)
+          .draw();
+      });
+    });
+  </script>
+{% endblock %}

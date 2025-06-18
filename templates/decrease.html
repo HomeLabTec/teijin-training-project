@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Bulk Decrease Skill Levels</h2>
+
+  {# DEBUG: show what parts arrived in the template #}
+  <pre style="background:#f8f8f8; padding:8px; border:1px solid #ccc;">
+Parts = {{ parts|pprint }}
+  </pre>
+
+  {% if parts %}
+    <form method="post" onsubmit="return confirmDecrease();">
+      <label>
+        Select Part / Machine:<br/>
+        <select name="part" id="partSelect">
+          {% for part in parts %}
+            <option value="{{ part }}">{{ part }}</option>
+          {% endfor %}
+        </select>
+      </label><br/>
+
+      <label>
+        Decrease by:<br/>
+        <select name="amount" id="amountSelect">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+        </select>
+      </label><br/>
+
+      <button type="submit">Apply to All</button>
+    </form>
+
+    <script>
+      function confirmDecrease() {
+        const part   = document.getElementById('partSelect').value;
+        const amount = document.getElementById('amountSelect').value;
+        return confirm(
+          `This will decrease the skill level for *all* users on:\n\n` +
+          `  • Part / Machine: ${part}\n` +
+          `  • By amount: ${amount}\n\n` +
+          `No skill level will go below 1. Continue?`
+        );
+      }
+    </script>
+  {% else %}
+    <p><strong>No parts/machines found.</strong><br/>
+    Double-check that your Excel has data in B1, D1, F1… (part names) and B2, D2, F2… (part numbers).</p>
+  {% endif %}
+{% endblock %}

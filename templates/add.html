@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Add a New Person</h2>
+  <form method="post">
+    <label>
+      Name:<br/>
+      <input name="name" type="text" required/>
+    </label>
+    <table>
+      <tr><th>Part / Machine</th><th>Starting Skill Level</th></tr>
+      {% for part in parts %}
+      <tr>
+        <td>{{ part }}</td>
+        <td>
+          <select name="{{ part }}">
+            {% for i in range(1,5) %}
+              <option value="{{ i }}">{{ i }}</option>
+            {% endfor %}
+          </select>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+    <button type="submit">Add Person</button>
+  </form>
+{% endblock %}

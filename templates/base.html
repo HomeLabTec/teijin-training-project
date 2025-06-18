@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Training Skill Tracker</title>
+  <style>
+    body {
+      background-color: #e6f7ff;
+      color: #333;
+      font-family: sans-serif;
+      transition: background 0.3s, color 0.3s;
+      padding: 0; margin: 0;
+    }
+    .dark-mode {
+      background-color: #1e1e1e;
+      color: #ddd;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .nav-links a,
+    .nav-links button {
+      text-decoration: none;
+      color: inherit;
+      background: transparent;
+      border: 1px solid currentColor;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #darkToggle {
+      margin-right: 0; /* since we're using gap */
+    }
+    .logo img {
+      max-height: 50px;
+      width: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+    th, td {
+      border: 1px solid #aaa;
+      padding: 8px;
+      text-align: center;
+    }
+    .dark-mode th, .dark-mode td {
+      border-color: #555;
+    }
+    input, select, button {
+      padding: 8px;
+      margin: 4px 0;
+    }
+  </style>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const toggle = document.getElementById("darkToggle");
+      if (localStorage.getItem("darkMode") === "true") {
+        document.body.classList.add("dark-mode");
+      }
+      toggle.addEventListener("click", () => {
+        document.body.classList.toggle("dark-mode");
+        localStorage.setItem(
+          "darkMode",
+          document.body.classList.contains("dark-mode")
+        );
+      });
+    });
+  </script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="nav-links">
+        <button id="darkToggle">Toggle Dark Mode</button>
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('add') }}">Add Person</a>
+        <a href="{{ url_for('display') }}">Display All</a>
+        <a href="{{ url_for('decrease') }}">Decrease Skill</a>
+      </div>
+      <div class="logo">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Company Logo">
+      </div>
+    </header>
+    <hr/>
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

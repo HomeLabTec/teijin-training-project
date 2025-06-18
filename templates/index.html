@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Training Tracker - Teijin Automotive Technologies</h1>
+  <input id="searchBox" type="text" placeholder="Start typing a name…" autocomplete="off"/>
+  <ul id="suggestions" style="list-style:none; padding-left:0;"></ul>
+
+  <script>
+    const box = document.getElementById("searchBox"),
+          list = document.getElementById("suggestions");
+
+    box.addEventListener("input", async () => {
+      const q = box.value;
+      if (!q) { list.innerHTML = ""; return; }
+      const res = await fetch("/search?q=" + encodeURIComponent(q));
+      const names = await res.json();
+      list.innerHTML = names.map(n =>
+        `<li><a href="/person/${encodeURIComponent(n)}">${n}</a></li>`
+      ).join("");
+    });
+  </script>
+{% endblock %}
