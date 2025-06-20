@@ -126,7 +126,30 @@ def schedule():
     """Display a table of stations with a dropdown of workers for each."""
     _, _, _, data = load_workbook_data()
     names = sorted(data.keys())
-    return render_template("schedule.html", stations=STATIONS, names=names)
+    stations = list(enumerate(STATIONS))
+    return render_template("schedule.html", stations=stations, names=names)
+
+
+@app.route("/generate_schedule", methods=["POST"])
+def generate_schedule():
+    """Store the submitted schedule and redirect to view page."""
+    schedule = {}
+    for idx, station in enumerate(STATIONS):
+        people = []
+        for j in range(6):
+            key = f"station{idx}_{j}"
+            people.append(request.form.get(key, ""))
+        schedule[station] = people
+    session['last_schedule'] = schedule
+    return redirect(url_for('view_schedule'))
+
+
+@app.route("/view_schedule")
+def view_schedule():
+    schedule = session.get('last_schedule')
+    if not schedule:
+        return redirect(url_for('schedule'))
+    return render_template("generated_schedule.html", schedule=schedule)
 
 
 @app.route("/generate_schedule", methods=["POST"])
