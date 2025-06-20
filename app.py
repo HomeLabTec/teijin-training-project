@@ -4,6 +4,18 @@ import os
 
 EXCEL_PATH = os.path.join(os.path.dirname(__file__), "training-master.xlsx")
 
+# list of stations for the schedule page
+STATIONS = [
+    "Press 1", "Press 2", "Press 3", "Press 4", "Press 5", "Press 6",
+    "Press 7", "Press 8", "Press 9", "Press 10", "Press 11", "Press 12",
+    "Press 13", "Press 20", "Press 25", "Press 26",
+    "JT Bonder 1", "JT Bonder 2",
+    "Water Jet 2", "Water Jet 3",
+    "Great White Bonder 1", "Great White Bonder 2", "Great White Sub Bonder",
+    "H567 Packout", "D-shield", "H567 Hood Bonder", "CS1",
+    "H567 Ext Bonder", "Driver Assignment", "PC Assignment", "Common Load",
+]
+
 def load_workbook_data():
     wb = openpyxl.load_workbook(EXCEL_PATH)
     ws = wb.active
@@ -106,6 +118,14 @@ def add():
         return redirect(url_for("index"))
 
     return render_template("add.html", parts=parts)
+
+
+@app.route("/schedule")
+def schedule():
+    """Display a table of stations with a dropdown of workers for each."""
+    _, _, _, data = load_workbook_data()
+    names = sorted(data.keys())
+    return render_template("schedule.html", stations=STATIONS, names=names)
 
 @app.route("/decrease", methods=["GET", "POST"])
 def decrease():
