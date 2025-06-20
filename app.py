@@ -151,6 +151,28 @@ def view_schedule():
         return redirect(url_for('schedule'))
     return render_template("generated_schedule.html", schedule=schedule)
 
+
+@app.route("/generate_schedule", methods=["POST"])
+def generate_schedule():
+    """Store the submitted schedule and redirect to view page."""
+    schedule = {}
+    for idx, station in enumerate(STATIONS):
+        people = []
+        for j in range(6):
+            key = f"station{idx}_{j}"
+            people.append(request.form.get(key, ""))
+        schedule[station] = people
+    session['last_schedule'] = schedule
+    return redirect(url_for('view_schedule'))
+
+
+@app.route("/view_schedule")
+def view_schedule():
+    schedule = session.get('last_schedule')
+    if not schedule:
+        return redirect(url_for('schedule'))
+    return render_template("generated_schedule.html", schedule=schedule)
+
 @app.route("/decrease", methods=["GET", "POST"])
 def decrease():
     wb, ws, headers, _ = load_workbook_data()
