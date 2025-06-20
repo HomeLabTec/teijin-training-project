@@ -1,37 +1,37 @@
 {% extends "base.html" %}
 {% block content %}
   <style>
-    .schedule-table td, .schedule-table th {
-      padding: 8px;
-      text-align: center;
+    .schedule-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
     }
-    .station-cell {
+    .station-box {
+      border: 1px solid #aaa;
+    }
+    .station-header {
       background-color: #cce4ff;
       font-weight: bold;
+      padding: 4px;
+      text-align: center;
     }
-    .name-cell {
+    .person-name {
       background-color: #ffffff;
+      padding: 4px;
+      text-align: center;
     }
   </style>
   <h2>Generated Schedule</h2>
-  <table class="schedule-table">
-    <thead>
-      <tr>
-        <th>Station</th>
-        {% for i in range(1,7) %}<th>Person {{ i }}</th>{% endfor %}
-      </tr>
-    </thead>
-    <tbody>
-      {% for station, people in schedule.items() %}
-      <tr>
-        <td class="station-cell">{{ station }}</td>
-        {% for person in people %}
-        <td class="name-cell">{{ person }}</td>
-        {% endfor %}
-      </tr>
+  <div class="schedule-grid">
+    {% for station, people in schedule.items() %}
+    <div class="station-box">
+      <div class="station-header">{{ station }}</div>
+      {% for person in people %}
+      <div class="person-name">{{ person }}</div>
       {% endfor %}
-    </tbody>
-  </table>
+    </div>
+    {% endfor %}
+  </div>
   <p style="margin-top:1em;">
     <a href="{{ url_for('schedule') }}">Back to Schedule Page</a> |
     <a href="{{ url_for('view_schedule') }}">Reload Generated Schedule</a>
