@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+  <style>
+    .schedule-table td, .schedule-table th {
+      padding: 8px;
+      text-align: center;
+    }
+    .station-cell {
+      background-color: #cce4ff;
+      font-weight: bold;
+    }
+    .name-cell {
+      background-color: #ffffff;
+    }
+  </style>
+  <h2>Generated Schedule</h2>
+  <table class="schedule-table">
+    <thead>
+      <tr>
+        <th>Station</th>
+        {% for i in range(1,7) %}<th>Person {{ i }}</th>{% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for station, people in schedule.items() %}
+      <tr>
+        <td class="station-cell">{{ station }}</td>
+        {% for person in people %}
+        <td class="name-cell">{{ person }}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p style="margin-top:1em;">
+    <a href="{{ url_for('schedule') }}">Back to Schedule Page</a> |
+    <a href="{{ url_for('view_schedule') }}">Reload Generated Schedule</a>
+  </p>
+{% endblock %}
