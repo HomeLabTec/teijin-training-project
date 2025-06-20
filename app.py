@@ -126,7 +126,8 @@ def schedule():
     """Display a table of stations with a dropdown of workers for each."""
     _, _, _, data = load_workbook_data()
     names = sorted(data.keys())
-    return render_template("schedule.html", stations=STATIONS, names=names)
+    stations = list(enumerate(STATIONS))
+    return render_template("schedule.html", stations=stations, names=names)
 
 
 @app.route("/generate_schedule", methods=["POST"])
