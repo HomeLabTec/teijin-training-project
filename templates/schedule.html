@@ -1,25 +1,40 @@
 {% extends "base.html" %}
 {% block content %}
+  <style>
+    .container {
+      max-width: 1500px;
+    }
+    .schedule-table select {
+      width: 150px;
+    }
+  </style>
   <h2>Schedule</h2>
-  <table>
+  <table class="schedule-table">
     <thead>
       <tr>
         <th>Station</th>
-        <th>Person</th>
+        <th>Person 1</th>
+        <th>Person 2</th>
+        <th>Person 3</th>
+        <th>Person 4</th>
+        <th>Person 5</th>
+        <th>Person 6</th>
       </tr>
     </thead>
     <tbody>
       {% for station in stations %}
       <tr>
         <td>{{ station }}</td>
+        {% for i in range(6) %}
         <td>
-          <select class="person-select" style="width: 200px;">
+          <select class="person-select">
             <option value="">-- Select --</option>
             {% for name in names %}
               <option value="{{ name }}">{{ name }}</option>
             {% endfor %}
           </select>
         </td>
+        {% endfor %}
       </tr>
       {% endfor %}
     </tbody>
@@ -31,6 +46,30 @@
   <script>
     $(function(){
       $('.person-select').select2();
+
+      function updateOptions() {
+        var selected = [];
+        $('.person-select').each(function(){
+          var val = $(this).val();
+          if (val) {
+            selected.push(val);
+          }
+        });
+        $('.person-select').each(function(){
+          var current = $(this).val();
+          $(this).find('option').prop('disabled', false);
+          var selectEl = this;
+          selected.forEach(function(name){
+            if (name !== current) {
+              $(selectEl).find('option[value="'+name.replace(/"/g,'\\"')+'"]').prop('disabled', true);
+            }
+          });
+          $(this).trigger('change.select2');
+        });
+      }
+
+      $('.person-select').on('change', updateOptions);
+      updateOptions();
     });
   </script>
 {% endblock %}
