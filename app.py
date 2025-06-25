@@ -16,6 +16,17 @@ STATIONS = [
     "H567 Ext Bonder", "Driver Assignment", "PC Assignment", "Common Load",
 ]
 
+# map schedule stations to training columns in the spreadsheet
+STATION_TO_HEADER = {
+    "JT Bonder 1": "JT Bonder",
+    "JT Bonder 2": "JT Bonder",
+    "Great White Bonder 1": "GW Bonder",
+    "Great White Bonder 2": "GW Bonder",
+    "Great White Sub Bonder": "GW Bonder",
+    "H567 Hood Bonder": "H567 Bonder",
+    "H567 Ext Bonder": "H567 Bonder",
+}
+
 def load_workbook_data():
     wb = openpyxl.load_workbook(EXCEL_PATH)
     ws = wb.active
@@ -47,6 +58,29 @@ def load_workbook_data():
         data[name] = skills
 
     return wb, ws, headers, data
+
+
+def build_level_lookup(data):
+    """Return mapping of name -> {station -> level} with default 1."""
+    levels = {}
+
+    def resolve_level(skills, base):
+        """Find the first skill header that starts with the given base name."""
+        for h, lvl in skills.items():
+            if h.startswith(base):
+                return lvl
+        return 1
+
+    for name, skills in data.items():
+        per_station = {}
+        for st in STATIONS:
+            base = STATION_TO_HEADER.get(st)
+            if base:
+                per_station[st] = resolve_level(skills, base)
+            else:
+                per_station[st] = 1
+        levels[name] = per_station
+    return levels
 
 
 app = Flask(__name__)
@@ -126,8 +160,9 @@ def schedule():
     """Display a table of stations with a dropdown of workers for each."""
     _, _, _, data = load_workbook_data()
     names = sorted(data.keys())
+    levels = build_level_lookup(data)
     stations = list(enumerate(STATIONS))
-    return render_template("schedule.html", stations=stations, names=names)
+    return render_template("schedule.html", stations=stations, names=names, levels=levels)
 
 
 @app.route("/generate_schedule", methods=["POST"])
@@ -149,7 +184,9 @@ def view_schedule():
     schedule = session.get('last_schedule')
     if not schedule:
         return redirect(url_for('schedule'))
-    return render_template("generated_schedule.html", schedule=schedule)
+    _, _, _, data = load_workbook_data()
+    levels = build_level_lookup(data)
+    return render_template("generated_schedule.html", schedule=schedule, levels=levels)
 
 @app.route("/decrease", methods=["GET", "POST"])
 def decrease():

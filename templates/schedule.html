@@ -7,6 +7,10 @@
     .schedule-table select {
       width: 150px;
     }
+    .level1 { background-color: #f8d7da; }
+    .level2 { background-color: #fff3cd; }
+    .level3 { background-color: #d4edda; }
+    .level4 { background-color: #c3e6cb; }
   </style>
   <h2>Schedule</h2>
   {% if session.get('last_schedule') %}
@@ -34,7 +38,7 @@
           <select class="person-select" name="station{{ idx }}_{{ i }}">
             <option value="">-- Select --</option>
             {% for name in names %}
-              <option value="{{ name }}">{{ name }}</option>
+              <option value="{{ name }}" data-level="{{ levels[name][station] }}">{{ name }}</option>
             {% endfor %}
           </select>
         </td>
@@ -51,7 +55,22 @@
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
   <script>
     $(function(){
-      $('.person-select').select2();
+      var levelColors = {1:'#f8d7da',2:'#fff3cd',3:'#d4edda',4:'#c3e6cb'};
+
+      function formatState (state) {
+        if (!state.id) { return state.text; }
+        var level = $(state.element).data('level') || 1;
+        var $el = $('<span>' + state.text + '</span>');
+        $el.addClass('level'+level);
+        return $el;
+      }
+
+      function updateCellColor(select) {
+        var level = $(select).find('option:selected').data('level');
+        $(select).closest('td').css('background-color', levelColors[level] || '');
+      }
+
+      $('.person-select').select2({ templateResult: formatState, templateSelection: formatState });
 
       function updateOptions() {
         var selected = [];
@@ -74,7 +93,11 @@
         });
       }
 
-      $('.person-select').on('change', updateOptions);
+      $('.person-select').on('change', function(){
+        updateOptions();
+        updateCellColor(this);
+      });
+      $('.person-select').each(function(){ updateCellColor(this); });
       updateOptions();
 
       $('#generateLink').on('click', function(e){
