@@ -63,12 +63,20 @@ def load_workbook_data():
 def build_level_lookup(data):
     """Return mapping of name -> {station -> level} with default 1."""
     levels = {}
+
+    def resolve_level(skills, base):
+        """Find the first skill header that starts with the given base name."""
+        for h, lvl in skills.items():
+            if h.startswith(base):
+                return lvl
+        return 1
+
     for name, skills in data.items():
         per_station = {}
         for st in STATIONS:
-            header = STATION_TO_HEADER.get(st)
-            if header:
-                per_station[st] = skills.get(header, 1)
+            base = STATION_TO_HEADER.get(st)
+            if base:
+                per_station[st] = resolve_level(skills, base)
             else:
                 per_station[st] = 1
         levels[name] = per_station
