@@ -16,10 +16,13 @@
       text-align: center;
     }
     .person-name {
-      background-color: #ffffff;
       padding: 4px;
       text-align: center;
     }
+    .level1 { background-color: #f8d7da; }
+    .level2 { background-color: #fff3cd; }
+    .level3 { background-color: #d4edda; }
+    .level4 { background-color: #c3e6cb; }
   </style>
   <h2>Generated Schedule</h2>
   <div class="schedule-grid">
@@ -27,7 +30,8 @@
     <div class="station-box">
       <div class="station-header">{{ station }}</div>
       {% for person in people %}
-      <div class="person-name">{{ person }}</div>
+      {% set lvl = levels.get(person, {}).get(station, 1) %}
+      <div class="person-name level{{ lvl }}">{{ person }}</div>
       {% endfor %}
     </div>
     {% endfor %}
